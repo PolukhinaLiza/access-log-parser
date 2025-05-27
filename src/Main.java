@@ -16,8 +16,11 @@ public class Main {
             boolean fileExists = file.exists();
             boolean isDirectory = file.isDirectory();
 
-            if (!fileExists || isDirectory) {
-                System.out.println("Вы не верно ввели путь к файлу");
+            if (!fileExists) {
+                System.out.println("Вы ввели путь к несуществующему файлу");
+                continue;
+            } else if (isDirectory){
+                System.out.println("Вы ввели путь к папке");
                 continue;
             }
             System.out.println("Путь указан верно");
