@@ -10,6 +10,9 @@ public class Statistics {
     private HashSet<String> existingPages;
     private HashMap<String, Integer> osFrequency;
     private int totalOsCount;
+    private HashSet<String> nonExistingPages;
+    private HashMap<String, Integer> browserFrequency;
+    private int totalBrowserCount;
 
     public Statistics() {
         this.totalTraffic = 0;
@@ -33,6 +36,10 @@ public class Statistics {
             existingPages.add(entry.getRequestPath());
         }
 
+        if (entry.getResponseCode() == 404) {
+            nonExistingPages.add(entry.getRequestPath());
+        }
+
         String os = entry.getUserAgent().getOsType();
         if (osFrequency.containsKey(os)){
             osFrequency.put(os, osFrequency.get(os) + 1);
@@ -40,6 +47,14 @@ public class Statistics {
             osFrequency.put(os, 1);
         }
         totalOsCount++;
+
+        String browser = entry.getUserAgent().getBrowser();
+        if (browserFrequency.containsKey(browser)){
+            browserFrequency.put(browser, browserFrequency.get(browser) + 1);
+        } else {
+            browserFrequency.put(browser, 1);
+        }
+        totalBrowserCount++;
     }
 
     public double getTrafficRate() {
@@ -56,6 +71,10 @@ public class Statistics {
         return existingPages;
     }
 
+    public HashSet<String> getNonExistingPages() {
+        return nonExistingPages;
+    }
+
     public HashMap<String, Double> getOsFrequency() {
 
         HashMap<String, Double> osStatistics = new HashMap<>();
@@ -67,5 +86,18 @@ public class Statistics {
         }
 
         return osStatistics;
+    }
+
+    public HashMap<String, Double> getBrowserFrequency() {
+
+        HashMap<String, Double> browserStatistics = new HashMap<>();
+        for (Map.Entry<String, Integer> entry: browserFrequency.entrySet()){
+            String browser = entry.getKey();
+            int count = entry.getValue();
+            double proportion = (double)count/totalBrowserCount;
+            browserStatistics.put(browser, proportion);
+        }
+
+        return browserStatistics;
     }
 }
