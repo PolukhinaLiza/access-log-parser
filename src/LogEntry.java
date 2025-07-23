@@ -9,7 +9,7 @@ public class LogEntry {
     private final int responseCode;
     private final int dataSize;
     private final String referer;
-    private final String userAgent;
+    private final UserAgent userAgent;
 
     public LogEntry(String line) {
         String[] parts = line.split(" ");
@@ -25,7 +25,7 @@ public class LogEntry {
         this.responseCode = Integer.parseInt(parts[8]);
         this.dataSize = Integer.parseInt(parts[9]);
         this.referer = parts[10];
-        this.userAgent = parts.length > 11 ? String.join(" ", java.util.Arrays.copyOfRange(parts, 11, parts.length)).replace("\"", "") : "-";
+        this.userAgent = new UserAgent(parts.length > 11 ? String.join(" ", java.util.Arrays.copyOfRange(parts, 11, parts.length)).replace("\"", "") : "-");
     }
 
     public String getIpAddress() {
