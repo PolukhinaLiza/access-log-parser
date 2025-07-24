@@ -1,7 +1,7 @@
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 public class Statistics {
     private int totalTraffic;
@@ -13,6 +13,10 @@ public class Statistics {
     private HashSet<String> nonExistingPages;
     private HashMap<String, Integer> browserFrequency;
     private int totalBrowserCount;
+    private int totalVisits = 0;
+    private int errorRequests = 0;
+    private Set<String> uniqueUserIPs = new HashSet<>();
+    private List<LogEntry> logEntries = new ArrayList<>();
 
     public Statistics() {
         this.totalTraffic = 0;
@@ -55,6 +59,16 @@ public class Statistics {
             browserFrequency.put(browser, 1);
         }
         totalBrowserCount++;
+
+        if (!entry.getUserAgent().getAllUserAgent().toLowerCase().contains("bot")) {
+            totalVisits++;
+            uniqueUserIPs.add(entry.getIpAddress());
+        }
+
+        if (entry.getResponseCode() >= 400 && entry.getResponseCode() < 600) {
+            errorRequests++;
+        }
+        logEntries.add(entry);
     }
 
     public double getTrafficRate() {
@@ -99,5 +113,28 @@ public class Statistics {
         }
 
         return browserStatistics;
+    }
+    public double averageVisitsPerHour() {
+        long hours = logEntries.stream()
+                .map(LogEntry::getDateTime)
+                .map(timestamp -> timestamp.toInstant(ZoneOffset.ofHours(3)).truncatedTo(ChronoUnit.HOURS))
+                .distinct()
+                .count();
+        return hours > 0 ? (double) totalVisits / hours : 0;
+    }
+
+    public double averageErrorsPerHour() {
+        long hours = logEntries.stream()
+                .map(LogEntry::getDateTime)
+                .map(timestamp -> timestamp.toInstant(ZoneOffset.ofHours(3)).truncatedTo(ChronoUnit.HOURS))
+                .distinct()
+                .count();
+
+        return hours > 0 ? (double) errorRequests / hours : 0;
+    }
+
+    public double averageVisitsPerUser() {
+        long realUsersCount = uniqueUserIPs.size();
+        return realUsersCount > 0 ? (double) totalVisits / realUsersCount : 0;
     }
 }

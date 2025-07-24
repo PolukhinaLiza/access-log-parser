@@ -1,11 +1,13 @@
 public class UserAgent {
     private final String osType;
     private final String browser;
+    private final String allUserAgent;
 
     public UserAgent(String userAgent) {
 
         this.osType = extractOsType(userAgent);
         this.browser = extractBrowser(userAgent);
+        this.allUserAgent = userAgent;
     }
 
     public String getOsType() {
@@ -14,6 +16,10 @@ public class UserAgent {
 
     public String getBrowser() {
         return browser;
+    }
+
+    public String getAllUserAgent() {
+        return allUserAgent;
     }
 
     private String extractOsType(String userAgent) {
